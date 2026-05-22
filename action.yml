@@ -1,0 +1,31 @@
+name: 'Label Auditor'
+description: 'Enforces PR label requirements, according to Semantic Versioning.'
+author: 'Chrimle'
+
+inputs:
+  required-labels:
+    description: 'Comma-separated list of always required labels'
+    required: false
+    default: 'bug, dependencies, doc, feat, meta, preview, refactor, security, test'
+  semver-required-labels:
+    description: 'Comma-separated list of labels that requires a SemVer-label'
+    required: false
+    default: 'feat, bug'
+  semver-labels:
+    description: 'Comma-separated list of valid SemVer labels'
+    required: false
+    default: 'MAJOR, MINOR, PATCH'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Audit PR Labels
+      uses: actions/github-script@v7
+      env:
+        REQ_LABELS: ${{ inputs.required-labels }}
+        SEMVER_REQ_LABELS: ${{ inputs.semver-required-labels }}
+        SEMVER_LABELS: ${{ inputs.semver-labels }}
+      with:
+        script: |
+          const audit = require(`${process.env.GITHUB_ACTION_PATH}/script.js`);
+          await audit({ core, context });
