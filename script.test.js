@@ -10,6 +10,8 @@ process.env.SEMVER_LABELS = 'major, minor, patch';
 async function runTests() {
     console.log('Starting tests...\n');
 
+    let hasFailed = false;
+
     // TEST 1: Throws error if missing required category
     try {
         const context = { payload: { pull_request: { labels: [{ name: 'documentation' }] } } };
@@ -21,6 +23,7 @@ async function runTests() {
         console.log('✅ Passed: Missing required category throws error');
     } catch (err) {
         console.error('❌ Failed: Test 1', err.message);
+        hasFailed = true;
     }
 
     // TEST 2: Returns early (succeeds) if category doesn't need semver
@@ -32,6 +35,7 @@ async function runTests() {
         console.log('✅ Passed: Category without semver requirement succeeds');
     } catch (err) {
         console.error('❌ Failed: Test 2', err);
+        hasFailed = true;
     }
 
     // TEST 3: Throws error if semver is required but missing
@@ -45,6 +49,7 @@ async function runTests() {
         console.log('✅ Passed: Missing semver throws error');
     } catch (err) {
         console.error('❌ Failed: Test 3', err.message);
+        hasFailed = true;
     }
 
     // TEST 4: Succeeds when all labels are correct
@@ -56,6 +61,11 @@ async function runTests() {
         console.log('✅ Passed: Valid labels succeed');
     } catch (err) {
         console.error('❌ Failed: Test 4', err);
+        hasFailed = true;
+    }
+
+    if (hasFailed) {
+        process.exit(1);
     }
 }
 
